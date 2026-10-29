@@ -1,0 +1,1179 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R] /Count 16 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 1678 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (Rootine Backend: Registration, Explained) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 731 Td (A beginner-friendly guide to the account-creation flow, the folders it uses, the code line by) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 717 Td (line, and the programming foundations behind it.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 700 Td (Prepared from the current Rootine backend files and the registration tests performed during) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 686 Td (this session.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 656 Td (What you will learn) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 633 Td (- How a registration request travels from an HTTP client through Express to the database.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 617 Td (- What routes, controllers, services, repositories, middleware, schemas, and database files) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 603 Td (- do.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 587 Td (- What imports, Zod's z, TypeScript types, async/await, bcrypt, and Drizzle queries mean.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 571 Td (- What the registration test results proved, and what still needs attention.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 547 Td (The examples and descriptions below are based on the code currently in the project. This is a) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 533 Td (learning guide, not a claim that login or email verification is already complete.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (1 / 16) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 3595 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (1. The big picture) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 731 Td (Imagine a small office that opens new customer accounts. A visitor submits a form. A) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 717 Td (receptionist checks that it is filled out correctly, a clerk handles the request, a policy) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 703 Td (desk checks the rules, a records desk talks to the database, and the office returns a result.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 686 Td (In this app, those roles are separated into code folders. Each part has one main) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 672 Td (responsibility. The separation makes it easier to understand, test, and change the system.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 650 Td (The registration request journey) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 627 Td (- A client sends HTTP POST /auth/register with JSON account details.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 611 Td (- Express parses the JSON body in app.ts.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 595 Td (- The auth router matches /register, because app.ts mounted that router under /auth.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 579 Td (- Validation middleware checks the request against registerSchema.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 563 Td (- The register controller calls signUpService and sends its result as JSON.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 547 Td (- The signup service checks for an existing email, hashes the password, and asks) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 533 Td (- UserRepository to create the account.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 517 Td (- UserRepository uses Drizzle to query or insert a row in the PostgreSQL users table.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 501 Td (- The response travels back to the client with an HTTP status such as 201 or 400.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 480 Td (A route analogy) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 457 Td (Think of a building address: the app is the building, /auth is a department, and /register is) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 443 Td (a desk in that department. Together the full route is /auth/register. POST means the visitor) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 429 Td (is submitting information, rather than asking to view a page.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 412 Td (POST http://localhost:7000/auth/register) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 394 Td (What the tests showed) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 371 Td (- A valid request returned 201 and a success message. The duplicate request then returned 400,) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 357 Td (- which confirms the account was saved and the duplicate check found it.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 341 Td (- A request without city returned 400 with a Zod validation issue. It was rejected before) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 327 Td (- account creation.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 311 Td (- The displayed PowerShell response showed an empty-looking user value. The repository is) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 297 Td (- intended to return the new user's ID, so verify that response payload before relying on it.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 281 Td (- The successful request wrote an account into the database. Keep that in mind; do not delete) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 267 Td (- or reset the database to continue the lesson.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (2 / 16) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 4360 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (2. What the folders are for) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 726 Td (src/routes - the directory and signposts) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 703 Td (Routes define which HTTP method and URL lead to which handlers. The auth router contains POST) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 689 Td (/register. Middleware is listed before the controller, so Express runs validation first.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 675 Td (Real-life analogy: a signpost directs a visitor to the right counter.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 658 Td (src/routes/auth-routes.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 640 Td (src/controllers - the receptionist) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 617 Td (A controller receives the Express request and chooses the HTTP response. The register) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 603 Td (controller passes req.body to the service, then uses the service's code and result to respond.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 589 Td (It should not contain the database's detailed query logic.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 572 Td (src/controllers/auth-controllers.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 554 Td (src/services - the business procedure) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 531 Td (A service coordinates what the application must do for a task. Signup checks for an existing) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 517 Td (account, hashes the password, creates the user, and returns a result. Analogy: the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 503 Td (receptionist follows the office's account-opening procedure.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 486 Td (src/services/auth/Sign-Up-Service.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 468 Td (src/repositories - the records desk) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 445 Td (A repository owns database operations. UserRepository finds an account by email and inserts a) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 431 Td (new user. The service asks the repository to do those operations without needing to know the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 417 Td (SQL/Drizzle details.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 400 Td (src/repositories/user-repository.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 382 Td (src/middlewares - checks every request in the hallway) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 359 Td (Middleware runs between receiving a request and reaching the controller. The schema middleware) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 345 Td (validates the request. If invalid, it sends a 400 response; if valid, next\(\) lets it continue.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 331 Td (Analogy: a security/check-in desk stops incomplete forms before they reach staff.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 314 Td (src/middlewares/schema-middleware.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 296 Td (src/schema - the form rules) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 273 Td (auth-schema.ts contains Zod rules for registration, login, and refresh-token request bodies.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 259 Td (It also derives TypeScript types from those rules. This is not the same as the database) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 245 Td (schema.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 228 Td (src/schema/auth-schema.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 210 Td (src/db - database connection and table design) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 187 Td (db/index.ts opens the PostgreSQL connection and creates the Drizzle database object.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 173 Td (db/schema.ts describes tables and columns to Drizzle. Analogy: index.ts is the phone line to) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 159 Td (the records office; schema.ts is the database's blueprint.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 142 Td (src/db/index.ts) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 129 Td (src/db/schema.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 111 Td (src/config - settings) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 88 Td (env.ts reads settings such as the port and database URL from environment variables. Settings) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 74 Td (keep environment-specific values out of the application logic.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (3 / 16) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 1493 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 772 Td (src/config/env.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 754 Td (src/app.ts and src/server.ts - build the app and turn it on) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 731 Td (app.ts creates the Express application, enables JSON parsing, and mounts the auth router.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 717 Td (server.ts starts the app listening on ENV.PORT. Analogy: app.ts arranges the desks; server.ts) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 703 Td (opens the building for visitors.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 686 Td (src/app.ts) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 673 Td (src/server.ts) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 655 Td (Folders and files not yet doing the full auth job) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 632 Td (A login schema exists, but the login controller/service/route flow is not implemented yet. A) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 618 Td (Log-In-Service.ts placeholder exists, but it is not part of registration. Email verification) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 604 Td (is not implemented. There is no need to delete the database, migrations, or server to build) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 590 Td (these features later.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (4 / 16) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 4447 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (3. Foundations: common programming words) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 726 Td (Values and data types) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 703 Td (- string: text, such as an email or a person's name.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 687 Td (- number: a numeric value, such as 7000 or an HTTP status code.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 671 Td (- boolean: true or false, such as whether an email was found.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 655 Td (- object: named values grouped together, such as { name, email }.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 639 Td (- array: an ordered list of values, such as rows returned by a database query.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 623 Td (- undefined: no value was found or assigned. A lookup can return undefined when there is no) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 609 Td (- matching user.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 593 Td (- null: an explicitly empty value. It is different from undefined.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 572 Td (Variables, constants, and names) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 549 Td (const creates a variable binding that cannot be reassigned. The object it points to might) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 535 Td (still be mutable, but simple values such as a string cannot be reassigned to that const name.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 521 Td (Names like input, userRepository, and passwordHash are names chosen by the programmer; they) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 507 Td (are not special words.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 485 Td (Functions, parameters, and returns) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 462 Td (A function is a reusable set of steps. A parameter is an input to that function. return sends) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 448 Td (a result back to its caller and stops that function. Example: signUpService\(input\) receives) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 434 Td (signup fields; return sends a success or error result to the controller.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 412 Td (Classes and instances) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 389 Td (A class groups related methods and describes how to make an object. UserRepository is a class.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 375 Td (new UserRepository\(\) makes an instance that the service can use, like taking a working copy of) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 361 Td (the records-desk toolkit.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 339 Td (Async and await) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 316 Td (A database or password hash takes time. async marks a function that can perform asynchronous) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 302 Td (work. await pauses that function until the work finishes, without freezing the whole server.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 288 Td (The result becomes available after the wait.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 266 Td (Imports and exports) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 243 Td (An import brings a value or type from another package/file into the current file. An export) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 229 Td (makes something available for other files to import. Like borrowing a tool from another room) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 215 Td (and labeling a tool for others to use.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 198 Td (import { z } from "zod";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 185 Td (The braces mean a named export is being selected. In this example, the Zod package exports a) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 171 Td (named value called z. z is Zod's main API object: it provides tools such as z.object\(\),) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 157 Td (z.string\(\), and z.email\(\). It is not a TypeScript keyword and it was not invented in this) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 143 Td (file. The package was installed as a project dependency.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 126 Td (import type { Request, Response } from "express";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 113 Td (The word type means these imports are only needed by TypeScript to check types. They are not) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 99 Td (runtime objects the app has to call.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 77 Td (Types are not runtime validation) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (5 / 16) Tj ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 16 0 R >>
+endobj
+16 0 obj
+<< /Length 1037 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 9.5 Tf 54 772 Td (A TypeScript type helps check our code while developing/building. It does not inspect a real) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 758 Td (HTTP request by itself. Zod's safeParse does runtime validation: it checks the actual data) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 744 Td (that arrived from a client.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 722 Td (Equality and comparisons) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 699 Td (Drizzle's eq helper means equal. eq\(users.email, email\) asks the database for rows where the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 685 Td (email column equals the supplied email. An if statement checks a condition and chooses whether) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 671 Td (to run its block.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (6 / 16) Tj ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 18 0 R >>
+endobj
+18 0 obj
+<< /Length 4623 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (4. The request rules: auth-schema.ts) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 731 Td (This file defines the shape that a registration request must follow. The outer body object) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 717 Td (mirrors Express's req.body location in the request.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 700 Td (import { z } from "zod";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 687 Td (Line meaning: import the named value z from the Zod library. z is the toolbox used to build) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 673 Td (validation rules.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 656 Td (export const registerSchema = z.object\({) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 643 Td (export makes registerSchema available to the route. const gives the schema a stable variable) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 629 Td (name. z.object\(\) says the value must be an object with the properties listed inside it.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 612 Td (body: z.object\({) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 599 Td (The schema expects an outer object with a property named body, and body itself must be an) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 585 Td (object. The middleware supplies this wrapper by checking { body: req.body }.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 568 Td (name: z.string\({ message: "Name is required" }\).min\(3, ...\),) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 555 Td (name must be text and at least 3 characters long. The message is the explanation if the string) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 541 Td (requirement fails. Note: this checks length, not whether the name contains only letters.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 524 Td (email: z.email\({ message: "Email is required and must be a valid email address" }\),) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 511 Td (z.email\(\) checks that the value is text in an email-like format. It does not prove that the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 497 Td (mailbox exists or belongs to the user.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 480 Td (password: z.string\({ message: "Password is required" }\).min\(10, ...\),) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 467 Td (password must be text and at least 10 characters. This is a minimum-length rule, not a) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 453 Td (password-strength meter.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 436 Td (phoneNumber: z.string\({ message: "Phone number is required" }\),) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 423 Td (countryCode: z.string\({ message: "Country code is required" }\),) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 410 Td (Both fields must be strings. As written, an empty string is still a string, so stronger) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 396 Td (non-empty/format rules could be added later.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 379 Td (city: z.string\({ message: ... }\)) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 366 Td (.regex\(/^[A-Za-z\\s]+$/, { message: ... }\)) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 353 Td (.regex\(/^[A-Z][a-zA-Z\\s]*$/, { message: ... }\)) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 340 Td (City must be text containing only ASCII letters/spaces, and must start with an uppercase) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 326 Td (letter. This also rejects valid real-world city names with accents, apostrophes, or hyphens;) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 312 Td (that limitation can be reviewed when desired.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 295 Td (}\),) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 282 Td (}\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 269 Td (These closing braces and parentheses finish the inner body object, the outer schema object,) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 255 Td (and the z.object\(\) call.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 238 Td (export type RegisterInput = z.infer<typeof registerSchema>["body"];) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 225 Td (export makes a reusable TypeScript type. z.infer<typeof registerSchema> asks TypeScript to) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 211 Td (derive a type from the Zod schema. ["body"] selects the inner body fields, not the outer) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 197 Td (wrapper. RegisterInput is a chosen name, not a special word. It represents the six fields and) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 183 Td (their TypeScript types. This does not validate live data; safeParse does that.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (7 / 16) Tj ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 20 0 R >>
+endobj
+20 0 obj
+<< /Length 3539 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (5. The validation checkpoint:) Tj ET
+0 0 0 rg
+BT /F1 20 Tf 54 738 Td (schema-middleware.ts) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 704 Td (import type { RequestHandler } from "express";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 691 Td (RequestHandler is Express's TypeScript description for middleware. type means it is only for) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 677 Td (type checking.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 660 Td (import { z } from "zod";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 647 Td (The middleware accepts a Zod schema, so it imports z to name that schema type.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 630 Td (export function validate\(schema: z.ZodType\): RequestHandler {) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 617 Td (Defines and exports a function named validate. Its schema parameter is a Zod schema. It) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 603 Td (returns an Express RequestHandler. The outer function receives a schema once and creates a) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 589 Td (middleware function for requests.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 572 Td (return \(req, res, next\) => {) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 559 Td (Returns the middleware. req is the incoming request, res is how we reply, and next\(\) tells) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 545 Td (Express to continue to the next handler.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 528 Td (const validationResult = schema.safeParse\({ body: req.body }\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 515 Td (safeParse checks the actual request body without throwing for ordinary invalid input. The) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 501 Td (wrapper matches the schema shape { body: ... }. validationResult contains either success data) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 487 Td (or validation issues.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 470 Td (if \(!validationResult.success\) {) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 457 Td (If validation did not succeed, enter the failure block.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 440 Td (return res.status\(400\).json\({ status: "error", ... }\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 427 Td (Send HTTP 400 and a JSON explanation. return is important: it stops the middleware so the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 413 Td (controller cannot run for invalid data.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 396 Td (}) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 383 Td (Closes the invalid-input block.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 366 Td (next\(\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 353 Td (The data was valid, so hand the request to the next handler: the register controller.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 336 Td (};) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 323 Td (}) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 310 Td (The first closing brace ends the returned middleware; the second ends validate.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 288 Td (Middleware order matters) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 265 Td (The route registers validate\(registerSchema\) before register. Express runs handlers in the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 251 Td (order listed. Validation is like checking a form for required fields before an account clerk) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 237 Td (processes it.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (8 / 16) Tj ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 22 0 R >>
+endobj
+22 0 obj
+<< /Length 4675 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (6. The database desk: user-repository.ts) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 731 Td (import { eq } from "drizzle-orm";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 718 Td (Imports Drizzle's eq helper. eq is short for equal; it builds a safe database comparison.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 701 Td (import { db } from "@/db";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 688 Td (Imports the database connection exported by src/db/index.ts. The @ alias is configured to mean) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 674 Td (src. The /db path resolves through the folder's index.ts.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 657 Td (import { users } from "@/db/schema";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 644 Td (Imports the Drizzle table definition named users from src/db/schema.ts. It is a description) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 630 Td (Drizzle uses to build queries, not a copy of the table's rows.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 613 Td (export class UserRepository {) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 600 Td (Defines an exported class that groups user database operations. The service can create an) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 586 Td (instance with new UserRepository\(\).) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 569 Td (async findByEmail\(email: string\) {) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 556 Td (Defines an async method. It receives one string, the email to search for. Async is needed) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 542 Td (because the database query takes time.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 525 Td (const [user] = await db) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 512 Td (.select\({ id: users.id }\)) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 499 Td (.from\(users\)) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 486 Td (.where\(eq\(users.email, email\)\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 473 Td (This chain means: wait for a query; select only the id column; search the users table; keep) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 459 Td (rows where users.email equals the supplied email. The database returns an array; [user] takes) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 445 Td (its first row. The email column is unique, so there can be at most one matching account. If) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 431 Td (there is no match, user is undefined.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 414 Td (return user;) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 401 Td (Give the matching ID result back to the service. The query intentionally does not retrieve the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 387 Td (password hash for this duplicate check.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 370 Td (}) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 357 Td (Closes findByEmail.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 340 Td (async create\(data: typeof users.$inferInsert\) {) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 327 Td (Defines the insert method. data contains the columns to save. typeof users.$inferInsert asks) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 313 Td (TypeScript for the allowed insert shape based on the Drizzle users table. This prevents) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 299 Td (spelling a column like password instead of passwordHash.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 282 Td (const [newUser] = await db) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 269 Td (.insert\(users\)) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 256 Td (.values\(data\)) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 243 Td (.returning\({ id: users.id }\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 230 Td (Insert into users with the supplied values. returning asks PostgreSQL to return a selected) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 216 Td (result from the inserted row. Only the id is requested, so the password hash and other fields) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 202 Td (are not returned.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 185 Td (return newUser;) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 172 Td (Give the new ID object to the service. The service wraps it in its result.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 155 Td (}) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 142 Td (}) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 129 Td (The final braces close create and the UserRepository class.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 107 Td (Database uniqueness is important) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 84 Td (The service first checks for a duplicate email, which gives a friendly response. The database) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (9 / 16) Tj ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 24 0 R >>
+endobj
+24 0 obj
+<< /Length 666 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 9.5 Tf 54 772 Td (also has a unique constraint on email, which is essential: two simultaneous requests could) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 758 Td (both pass the check before either inserts. A production-ready service should translate a) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 744 Td (unique-constraint error into a clean conflict response.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (10 / 16) Tj ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 26 0 R >>
+endobj
+26 0 obj
+<< /Length 5021 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (7. The signup procedure: Sign-Up-Service.ts) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 731 Td (import bcrypt from "bcrypt";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 718 Td (Imports bcrypt's default API. bcrypt makes a one-way password hash. The stored value is not) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 704 Td (the original password.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 687 Td (import type { RegisterInput } from "@/schema/auth-schema";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 674 Td (Imports the inferred TypeScript shape for registration data. type means compile-time only.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 660 Td (@/schema resolves to src/schema.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 643 Td (import { UserRepository } from "@/repositories/user-repository";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 630 Td (Imports the records-desk class so the service delegates database work to the repository.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 613 Td (export async function signUpService\(input: RegisterInput\) {) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 600 Td (Export makes the function available to the controller. async allows database and hashing) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 586 Td (waits. input is the parameter name; RegisterInput describes its fields. The opening brace) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 572 Td (starts the procedure.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 555 Td (const { name, email, password, phoneNumber, countryCode, city } = input;) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 542 Td (Object destructuring copies named fields from input into local variables. Instead of writing) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 528 Td (input.email each time, the function can use email.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 511 Td (const userRepository = new UserRepository\(\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 498 Td (Create an instance of the repository. This gives the service methods such as findByEmail and) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 484 Td (create.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 467 Td (const existingUser = await userRepository.findByEmail\(email\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 454 Td (Ask the repository whether this email is already in the database, and wait for its result.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 437 Td (if \(existingUser\) {) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 424 Td (return { code: 400, status: "error", message: "Email already exists" };) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 411 Td (}) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 398 Td (If a match exists, return an error result immediately. return stops the signup procedure, so) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 384 Td (hashing and inserting do not happen for this ordinary duplicate case. 400 means the request) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 370 Td (conflicts with current data in this project's chosen response convention; HTTP 409 Conflict is) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 356 Td (another common choice.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 339 Td (const passwordHash = await bcrypt.hash\(password, 12\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 326 Td (Wait for bcrypt to hash the submitted password. 12 is bcrypt's work factor/cost setting:) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 312 Td (higher values take more computation. The app saves passwordHash, never the raw password.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 295 Td (const newUser = await userRepository.create\({) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 282 Td (name, email, passwordHash, phoneNumber, countryCode, city,) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 269 Td (}\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 256 Td (Ask the repository to insert the account. The object property shorthand means { name } is the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 242 Td (same as { name: name }. passwordHash matches the Drizzle column/property name in db/schema.ts.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 228 Td (await waits for the insert result.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 211 Td (return {) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 198 Td (code: 201, status: "success",) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 185 Td (message: "Account created successfully.",) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 172 Td (data: { user: newUser },) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 159 Td (};) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 146 Td (Return the success object to the controller. 201 is the HTTP Created status. data.user) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 132 Td (contains the ID object the repository returned. This is an internal service result until the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 118 Td (controller sends it.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 101 Td (}) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 88 Td (Closes the function.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (11 / 16) Tj ET
+endstream
+endobj
+27 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 28 0 R >>
+endobj
+28 0 obj
+<< /Length 851 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 13 Tf 54 772 Td (Why the layers matter) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 749 Td (The signup service does not construct SQL or choose Express response methods. It coordinates) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 735 Td (the business steps. The repository owns persistence. The controller owns HTTP communication.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 721 Td (This is the same separation used in the instructor's example, adapted to Rootine's six) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 707 Td (registration fields and passwordHash column.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (12 / 16) Tj ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 30 0 R >>
+endobj
+30 0 obj
+<< /Length 4371 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (8. Controller, route, app, and server) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 726 Td (auth-controllers.ts) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 703 Td (import type { Request, Response } from "express";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 690 Td (Import Express's request/response types for TypeScript checking; type means these aren't) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 676 Td (runtime imports.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 659 Td (import { signUpService } from "@/services/auth/Sign-Up-Service";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 646 Td (Import the signup procedure so the controller can call it.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 629 Td (export async function register\(req: Request, res: Response\) {) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 616 Td (Export a controller named register. req is typed as an Express request and res as its) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 602 Td (response. async allows awaiting the service.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 585 Td (const result = await signUpService\(req.body\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 572 Td (Read the parsed JSON body from req.body, pass it to the service, and wait for the service) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 558 Td (result. The request middleware already checked its shape.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 541 Td (return res.status\(result.code\).json\(result\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 528 Td (Use the service's code as the HTTP status, then send the result as JSON. return ends the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 514 Td (controller after responding.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 497 Td (}) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 479 Td (auth-routes.ts) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 456 Td (import { Router } from "express";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 443 Td (Router is a named Express export used to group routes.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 426 Td (import { register } from "@/controllers/auth-controllers";) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 413 Td (import { registerSchema } from "@/schema/auth-schema";) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 400 Td (import { validate } from "@/middlewares/schema-middleware";) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 387 Td (These imports bring in the controller, validation rules, and validation middleware.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 370 Td (const authRouter = Router\(\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 357 Td (Create a router instance to hold the auth endpoints.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 340 Td (authRouter.post\("/register", validate\(registerSchema\), register\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 327 Td (Register a POST route at /register. First validate the body with registerSchema; then call) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 313 Td (register if validation succeeded. app.ts adds the /auth prefix, producing /auth/register.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 296 Td (export default authRouter;) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 283 Td (Make this router the default export so app.ts can import it without braces.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 261 Td (app.ts) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 238 Td (import express from "express";) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 225 Td (import authRouter from "@/routes/auth-routes";) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 212 Td (const app = express\(\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 199 Td (Import Express and the router, then create the application.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 182 Td (app.use\(express.json\(\)\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 169 Td (Install built-in middleware that parses incoming JSON request bodies into req.body.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 152 Td (app.use\("/auth", authRouter\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 139 Td (Mount every auth route below the /auth path prefix.) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 122 Td (export default app;) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 109 Td (Export the configured app for server.ts.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 87 Td (server.ts) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (13 / 16) Tj ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 32 0 R >>
+endobj
+32 0 obj
+<< /Length 1050 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 772 Td (import app from "./app";) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 759 Td (import { ENV } from "@/config/env";) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 746 Td (app.listen\(ENV.PORT, \(\) => {) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 733 Td (console.log\(`Server is running on port ${ENV.PORT}`\);) Tj ET
+0.12 0.22 0.34 rg
+BT /F2 8.1 Tf 64 720 Td (}\);) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 707 Td (Import the app and environment settings. listen starts accepting network requests on the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 693 Td (configured port. The callback prints a startup message. Template-literal backticks allow) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 679 Td (${ENV.PORT} to insert the port value.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (14 / 16) Tj ET
+endstream
+endobj
+33 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 34 0 R >>
+endobj
+34 0 obj
+<< /Length 4661 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 20 Tf 54 765 Td (9. Database blueprint, testing, and what is) Tj ET
+0 0 0 rg
+BT /F1 20 Tf 54 738 Td (next) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 699 Td (Drizzle database schema vs Zod request schema) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 676 Td (Zod's auth-schema.ts checks data coming into the API. Drizzle's db/schema.ts describes) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 662 Td (database tables and columns. They solve different problems: one checks the submitted form; the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 648 Td (other tells the database library how data is stored.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 631 Td (- users has an ID, name, unique email, passwordHash, role, phoneNumber, countryCode, city,) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 617 Td (- createdAt, and updatedAt.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 601 Td (- tokens has a token type, token value, expiry/lifecycle dates, and a userId link. The table) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 587 Td (- exists, but email verification/token behavior is not implemented yet.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 571 Td (- db/index.ts loads DATABASE_URL, creates a PostgreSQL connection pool, and gives Drizzle the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 557 Td (- schema.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 541 Td (- Migration SQL files describe database changes over time. Do not delete the database or rerun) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 527 Td (- migrations blindly. The name column was added by a migration, so database migration status) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 513 Td (- matters if setup errors occur.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 492 Td (How the tests were run) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 469 Td (The backend was started in one terminal with npm run dev from the backend folder. A second) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 455 Td (PowerShell terminal sent a JSON POST request to localhost:7000/auth/register.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 438 Td (Observed outcomes: a valid request returned 201; the same email returned 400 with Email) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 424 Td (already exists; a request missing city returned 400 with the issue path body.city. This) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 410 Td (confirmed the route, validation, duplicate lookup, and account insert were operating together.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 393 Td (The successful request created a persistent test account. The duplicate test confirmed it was) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 379 Td (still there. Do not treat the sample test row as temporary; it remains until intentionally) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 365 Td (handled through a suitable database operation.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 343 Td (Important follow-up before login) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 320 Td (- Inspect the actual JSON response for the first successful signup. PowerShell displayed the) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 306 Td (- nested user as empty-looking, even though the repository code intends to return an ID.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 292 Td (- Confirm whether the response contains an ID.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 276 Td (- Handle a duplicate-email database unique-constraint race cleanly; the initial lookup alone) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 262 Td (- cannot prevent simultaneous requests.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 246 Td (- Normalize email consistently \(for example trimming and lowercasing\) before both lookup and) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 232 Td (- insertion.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 216 Td (- Consider stronger phone/country-code validation and city rules that support) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 202 Td (- accented/hyphenated names.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 186 Td (- Add a centralized error response so unexpected database/hash errors do not become confusing) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 172 Td (- default server responses.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 156 Td (- Only after this, build login: find the user by email, retrieve the stored password hash for) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 142 Td (- comparison, compare with bcrypt, and decide the token/session flow.) Tj ET
+0 0 0 rg
+BT /F1 13 Tf 54 121 Td (Quick glossary) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 98 Td (- API: a set of URLs and rules clients use to talk to a server.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 82 Td (- HTTP method: the kind of request; POST commonly submits/creates data.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (15 / 16) Tj ET
+endstream
+endobj
+35 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 36 0 R >>
+endobj
+36 0 obj
+<< /Length 1220 >>
+stream
+0.12 0.27 0.42 rg
+BT /F1 8 Tf 54 808 Td (ROOTINE BACKEND - REGISTRATION LEARNING GUIDE) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 798 m 543 798 l S
+0 0 0 rg
+0 0 0 rg
+BT /F1 9.5 Tf 62 772 Td (- JSON: a text format for objects and arrays sent over a network.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 756 Td (- Middleware: a request-processing step that can respond or pass control onward.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 740 Td (- Hash: a one-way transformed value; bcrypt is designed for passwords.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 724 Td (- Repository: a layer that keeps database queries separate from business rules.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 708 Td (- Schema: a description of valid data or database structure; context tells which kind.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 692 Td (- Status code: a number summarizing the HTTP outcome, such as 201 created or 400) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 62 678 Td (- invalid/conflicting input.) Tj ET
+0 0 0 rg
+BT /F1 9.5 Tf 54 654 Td (End of guide. The database and migrations were not changed while preparing this document.) Tj ET
+0.76 0.81 0.86 RG 0.6 w
+52 44 m 543 44 l S
+0.25 0.3 0.35 rg
+BT /F1 8 Tf 54 29 Td (Learning notes - Rootine backend) Tj ET
+BT /F1 8 Tf 521 29 Td (16 / 16) Tj ET
+endstream
+endobj
+xref
+0 37
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000219 00000 n 
+0000000316 00000 n 
+0000000411 00000 n 
+0000000547 00000 n 
+0000002277 00000 n 
+0000002413 00000 n 
+0000006060 00000 n 
+0000006197 00000 n 
+0000010610 00000 n 
+0000010748 00000 n 
+0000012294 00000 n 
+0000012432 00000 n 
+0000016932 00000 n 
+0000017070 00000 n 
+0000018160 00000 n 
+0000018298 00000 n 
+0000022974 00000 n 
+0000023112 00000 n 
+0000026704 00000 n 
+0000026842 00000 n 
+0000031570 00000 n 
+0000031708 00000 n 
+0000032426 00000 n 
+0000032564 00000 n 
+0000037638 00000 n 
+0000037776 00000 n 
+0000038679 00000 n 
+0000038817 00000 n 
+0000043241 00000 n 
+0000043379 00000 n 
+0000044482 00000 n 
+0000044620 00000 n 
+0000049334 00000 n 
+0000049472 00000 n 
+trailer
+<< /Size 37 /Root 1 0 R >>
+startxref
+50745
+%%EOF
