@@ -19,6 +19,7 @@ export const role = pgEnum("Role", ["USER"]);
 export const tokenType = pgEnum("TokenType", [
   "REFRESH",
   "EMAIL_VERIFY",
+  "PASSWORD_RESET",
 ]);
 
 // Purpose: Define the columns and rules for a user account.

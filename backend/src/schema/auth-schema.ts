@@ -33,6 +33,22 @@ export const loginSchema = z.object({
     }),
 }); 
 
+export const forgotPasswordSchema = z.object({
+    body: z.object({
+        email: z.string({ message: "Invalid Email format" })
+        .email({ message: "Email must be a valid email address" }),
+    }),
+});
+
+export const resetPasswordSchema = z.object({
+    body: z.object({
+        token: z.string({ message: "Token is required" }),
+        newPassword: z.string({ message: "New password is required" })
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, { message: "New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character" })
+        .min(8, { message: "New password must be at least 8 characters" }),
+    }),
+});
+
 // Purpose: Describe the optional refreshToken request-body field for a future refresh endpoint.
 // Meaning: The schema exists, but the refresh-token flow is not connected yet.
 export const refreshTokenSchema = z.object({
@@ -46,3 +62,5 @@ export const refreshTokenSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>["body"];
 export type LoginInput = z.infer<typeof loginSchema>["body"];
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>["body"];
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>["body"];
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>["body"];
