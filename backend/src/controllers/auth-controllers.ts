@@ -4,6 +4,7 @@ import { signUpService } from "@/services/auth/Sign-Up-Service";
 import { loginService } from "@/services/auth/Log-In-Service";
 import { forgotPasswordService } from "@/services/auth/Forgot-Password-Service";
 import { resetPassword } from "@/services/auth/Forgot-Password-Service";
+import { refreshTokenService } from "@/services/auth/Refresh-Token-Service";
 
 
 
@@ -34,4 +35,8 @@ export async function passwordReset(req: Request, res: Response) {
     const { token, newPassword } = req.body;
     const result = await resetPassword(token, newPassword);
     return res.status(result.code).json(result);
+}
+
+export async function refreshTokenService(req: Request, res: Response) {
+    const {ref}
 }

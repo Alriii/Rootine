@@ -35,6 +35,8 @@ export class TokenRepository {
             .set({ consumedAt: new Date().toISOString() })
             .where(eq(tokens.id, id));
     }
+
+    
 }
 
 export const tokenRepository = new TokenRepository();
