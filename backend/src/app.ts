@@ -1,15 +1,43 @@
-// Purpose: Set up the Express application and connect its routes.
+// Purpose: Set up the Express application, security middleware, and connect routes.
 import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import hpp from "hpp";
 import authRouter from "@/routes/auth-routes";
+import { errorHandler } from "@/middlewares/error-middleware";
+import { ENV } from "@/config/env";
 
-// Meaning: Create the application that will receive HTTP requests.
 const app = express();
 
-// Purpose: Convert incoming JSON request bodies into JavaScript values on req.body.
+// Security HTTP headers
+app.use(helmet());
+
+// Enable CORS for API clients
+app.use(cors());
+
+// Protect against HTTP Parameter Pollution
+app.use(hpp());
+
+// Parse cookie headers
+app.use(cookieParser());
+
+// Convert incoming JSON request bodies into JavaScript values on req.body
 app.use(express.json());
 
-// Meaning: Mount authentication endpoints under /auth, such as /auth/register.
+// Health check endpoint
+app.get("/health", (_req, res) => {
+    res.status(200).json({
+        status: "success",
+        message: `${ENV.APP_NAME} is healthy`,
+        timestamp: new Date().toISOString(),
+    });
+});
+
+// Authentication endpoints
 app.use("/auth", authRouter);
 
-// Purpose: Let server.ts start this configured application.
+// Centralized error handling
+app.use(errorHandler);
+
 export default app;

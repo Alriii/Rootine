@@ -1,27 +1,18 @@
-// Purpose: Translate the HTTP registration request into a service call and HTTP response.
+// Purpose: Translate HTTP authentication requests into service calls and HTTP responses.
 import type { Request, Response } from "express";
 import { signUpService } from "@/services/auth/Sign-Up-Service";
 import { loginService } from "@/services/auth/Log-In-Service";
-import { forgotPasswordService } from "@/services/auth/Forgot-Password-Service";
-import { resetPassword } from "@/services/auth/Forgot-Password-Service";
-import { refreshTokenService } from "@/services/auth/Refresh-Token-Service";
+import { forgotPasswordService, resetPassword } from "@/services/auth/Forgot-Password-Service";
+import { refreshTokenService, logoutService } from "@/services/auth/Refresh-Token-Service";
+import { verifyEmailService, resendVerificationEmailService } from "@/services/auth/Email-Verification-Service";
+import { userRepository } from "@/repositories/user-repository";
 
-
-
-
-// Meaning: req contains the incoming request; res is used to send the answer.
 export async function register(req: Request, res: Response) {
-
-    // Purpose: Pass the already-validated request body to the signup business logic.
     const result = await signUpService(req.body);
-
-    // Purpose: Use the service's status code and send its result as JSON to the client.
     return res.status(result.code).json(result);
 }
 
 export async function login(req: Request, res: Response) {
-
-    // Purpose: Pass the already-validated request body to the login business logic.
     const result = await loginService(req.body);
     return res.status(result.code).json(result);
 }
@@ -37,6 +28,41 @@ export async function passwordReset(req: Request, res: Response) {
     return res.status(result.code).json(result);
 }
 
-export async function refreshTokenService(req: Request, res: Response) {
-    const {ref}
+export async function refreshToken(req: Request, res: Response) {
+    const { refreshToken } = req.body;
+    const result = await refreshTokenService(refreshToken);
+    return res.status(result.code).json(result);
+}
+
+export async function logout(req: Request, res: Response) {
+    const { refreshToken } = req.body;
+    const result = await logoutService(refreshToken);
+    return res.status(result.code).json(result);
+}
+
+export async function verifyEmail(req: Request, res: Response) {
+    const { token } = req.body;
+    const result = await verifyEmailService(token);
+    return res.status(result.code).json(result);
+}
+
+export async function resendVerification(req: Request, res: Response) {
+    const result = await resendVerificationEmailService(req.body);
+    return res.status(result.code).json(result);
+}
+
+export async function getMe(req: Request, res: Response) {
+    if (!req.user?.userId) {
+        return res.status(401).json({ status: "error", message: "Unauthorized" });
+    }
+
+    const user = await userRepository.findById(req.user.userId);
+    if (!user) {
+        return res.status(404).json({ status: "error", message: "User not found" });
+    }
+
+    return res.status(200).json({
+        status: "success",
+        data: { user },
+    });
 }

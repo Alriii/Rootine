@@ -13,6 +13,7 @@ export default defineConfig(
         "eslint.config.js",
         "eslint.config.ts",
         "drizzle.config.ts",
+        "server.js",
         ".env",
         "*.sql",
         "*.md",

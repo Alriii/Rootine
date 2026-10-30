@@ -1,32 +1,30 @@
 import crypto from "crypto";
-import { eq, and, isNull } from "drizzle-orm";
-import { db } from "@/db";
-import { tokens, users, tokenType } from "@/db/schema";
-import { tokenRepository } from "@/repositories/token-repository";
-import { UserRepository } from "@/repositories/user-repository";
-import { ENV } from "@/config/env";
 import bcrypt from "bcrypt";
+import { tokenRepository } from "@/repositories/token-repository";
+import { userRepository } from "@/repositories/user-repository";
+import { sendEmail } from "@/utils/mailer";
+import { ENV } from "@/config/env";
 
 // 10 minutes in milliseconds
 const RESET_TOKEN_EXPIRY_MS = 10 * 60 * 1000;
 
 export async function forgotPasswordService({ email }: { email: string }) {
-    // Purpose: Find the user by email.
-    const userRepository = new UserRepository();
     const user = await userRepository.findByEmail(email);
 
     if (!user) {
-        return { code: 200, status: "success", message: "If the email exists, a reset link has been sent." };
+        return {
+            code: 200,
+            status: "success",
+            message: "If the email exists, a reset token has been sent.",
+        };
     }
 
     const token = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-
     const expiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRY_MS).toISOString();
-    await db
-    .update(tokens)
-    .set({ revokedAt: new Date().toISOString() })
-    .where(and(eq(tokens.userId, user.id), eq(tokens.type, "PASSWORD_RESET"), isNull(tokens.consumedAt), isNull(tokens.revokedAt)));
+
+    // Revoke previous active reset tokens for this user
+    await tokenRepository.revokeActiveTokensByUserAndType(user.id, "PASSWORD_RESET");
 
     await tokenRepository.create({
         type: "PASSWORD_RESET",
@@ -35,24 +33,47 @@ export async function forgotPasswordService({ email }: { email: string }) {
         userId: user.id,
     });
 
-    return { code: 200, status: "success", message: "If the email exists, a reset link has been sent.", token };
+    // Deliver reset token (pure text/token, no frontend URLs)
+    await sendEmail({
+        to: email,
+        subject: `Password Reset Token - ${ENV.APP_NAME}`,
+        html: `<p>Your password reset token is: <strong>${token}</strong></p><p>This token expires in 10 minutes.</p>`,
+        text: `Your password reset token is: ${token}\n\nThis token expires in 10 minutes.`,
+    });
+
+    return {
+        code: 200,
+        status: "success",
+        message: "If the email exists, a reset token has been sent.",
+        token,
+    };
 }
 
 export async function resetPassword(token: string, newPassword: string) {
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
     const tokenRecord = await tokenRepository.findByToken(tokenHash);
 
-    if (!tokenRecord || tokenRecord.type !== "PASSWORD_RESET" || new Date(tokenRecord.expiresAt) < new Date() || tokenRecord.consumedAt || tokenRecord.revokedAt) {
-        return { code: 400, status: "error", message: "Invalid or expired token." };
+    if (
+        !tokenRecord ||
+        tokenRecord.type !== "PASSWORD_RESET" ||
+        new Date(tokenRecord.expiresAt) < new Date() ||
+        tokenRecord.consumedAt ||
+        tokenRecord.revokedAt
+    ) {
+        return {
+            code: 400,
+            status: "error",
+            message: "Invalid or expired token.",
+        };
     }
 
-    const passwordHash = await bcrypt.hash(newPassword, 10);
-    await db
-    .update(users)
-    .set({ passwordHash })
-    .where(eq(users.id, tokenRecord.userId));
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await userRepository.updatePassword(tokenRecord.userId, passwordHash);
     await tokenRepository.markConsumed(tokenRecord.id);
 
-    return { code: 200, status: "success", message: "Password has been reset successfully." };
-        
+    return {
+        code: 200,
+        status: "success",
+        message: "Password has been reset successfully.",
+    };
 }

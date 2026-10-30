@@ -6,6 +6,7 @@ import {
   pgEnum,
   uuid,
   text,
+  boolean,
   timestamp,
   index,
 } from "drizzle-orm/pg-core";
@@ -59,7 +60,12 @@ export const users = pgTable("users", {
   city: text("city")
     .notNull(),
 
-  // Purpose: Record when the account was created.
+    // Purpose: Track whether the user's email has been verified.
+    emailVerified: boolean("email_verified")
+      .default(false)
+      .notNull(),
+
+    // Purpose: Record when the account was created.
   createdAt: timestamp("created_at", {
     withTimezone: true,
   })
