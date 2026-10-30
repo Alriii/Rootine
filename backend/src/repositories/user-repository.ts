@@ -42,3 +42,5 @@ export class UserRepository {
         return user;
     }
 }
+
+export const userRepository = new UserRepository();
