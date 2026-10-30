@@ -53,7 +53,8 @@ export const resetPasswordSchema = z.object({
 // Meaning: The schema exists, but the refresh-token flow is not connected yet.
 export const refreshTokenSchema = z.object({
   body: z.object({
-    refreshToken: z.string().optional(),
+    refreshToken: z.string()
+    .optional(),
   }),
 });
 
