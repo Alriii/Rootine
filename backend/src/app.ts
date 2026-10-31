@@ -17,9 +17,14 @@ const app = express();
 app.use(helmet());
 
 // Enable CORS for API clients
-// Allows requests from frontend dev servers (5173, 3000) or configured origin
+// Allows requests from frontend dev servers, Vercel deployments, or configured origin
+const configuredOrigins = (ENV.CORS_ORIGIN || "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+
 const allowedOrigins = [
-    ENV.CORS_ORIGIN,
+    ...configuredOrigins,
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:3000",
@@ -29,10 +34,14 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (
+            !origin ||
+            allowedOrigins.includes(origin) ||
+            origin.endsWith(".vercel.app")
+        ) {
             callback(null, true);
         } else {
-            callback(new Error("Not allowed by CORS"));
+            callback(new Error(`Not allowed by CORS: ${origin}`));
         }
     },
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
@@ -80,10 +89,10 @@ const authLimiter = rateLimit({
 });
 
 // Health check endpoint (exempt from auth rate limit)
-app.get("/health", (_req, res) => {
+app.get(["/", "/health"], (_req, res) => {
     res.status(200).json({
         status: "success",
-        message: `${ENV.APP_NAME} is healthy`,
+        message: `${ENV.APP_NAME} is running`,
         timestamp: new Date().toISOString(),
     });
 });
