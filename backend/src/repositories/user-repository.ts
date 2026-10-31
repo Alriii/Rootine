@@ -13,6 +13,7 @@ export class UserRepository {
                 email: users.email,
                 name: users.name,
                 emailVerified: users.emailVerified,
+                timezone: users.timezone,
             })
             .from(users)
             .where(eq(users.email, email))
@@ -32,6 +33,7 @@ export class UserRepository {
                 phoneNumber: users.phoneNumber,
                 countryCode: users.countryCode,
                 city: users.city,
+                timezone: users.timezone,
                 emailVerified: users.emailVerified,
                 createdAt: users.createdAt,
                 updatedAt: users.updatedAt,
@@ -67,6 +69,7 @@ export class UserRepository {
                 role: users.role,
                 passwordHash: users.passwordHash,
                 emailVerified: users.emailVerified,
+                timezone: users.timezone,
             })
             .from(users)
             .where(eq(users.email, email))
@@ -93,6 +96,17 @@ export class UserRepository {
             .set({ emailVerified, updatedAt: new Date() })
             .where(eq(users.id, id))
             .returning({ id: users.id, emailVerified: users.emailVerified });
+
+        return updatedUser;
+    }
+
+    // Purpose: Update a user's timezone.
+    async updateTimezone(id: string, timezone: string) {
+        const [updatedUser] = await db
+            .update(users)
+            .set({ timezone, updatedAt: new Date() })
+            .where(eq(users.id, id))
+            .returning({ id: users.id, timezone: users.timezone });
 
         return updatedUser;
     }

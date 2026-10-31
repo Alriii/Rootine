@@ -5,6 +5,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import hpp from "hpp";
 import authRouter from "@/routes/auth-routes";
+import taskRouter from "@/routes/task-routes";
 import { errorHandler } from "@/middlewares/error-middleware";
 import { ENV } from "@/config/env";
 
@@ -36,6 +37,9 @@ app.get("/health", (_req, res) => {
 
 // Authentication endpoints
 app.use("/auth", authRouter);
+
+// Task management endpoints
+app.use("/tasks", taskRouter);
 
 // Centralized error handling
 app.use(errorHandler);

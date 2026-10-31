@@ -1,4 +1,3 @@
-
 // Purpose: Describe the PostgreSQL tables and columns that Drizzle uses in this application.
 // Meaning: This is the database blueprint; it does not itself create or delete database records.
 import {
@@ -9,6 +8,9 @@ import {
   boolean,
   timestamp,
   index,
+  integer,
+  jsonb,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 // Purpose: List the account roles the application supports.
@@ -22,6 +24,20 @@ export const tokenType = pgEnum("TokenType", [
   "EMAIL_VERIFY",
   "PASSWORD_RESET",
 ]);
+
+// Purpose: List the frequency modes supported for recurring tasks.
+export const taskFrequency = pgEnum("TaskFrequency", [
+  "DAILY",
+  "SPECIFIC_DAYS",
+  "TIMES_PER_WEEK",
+]);
+
+// Purpose: TypeScript type definition for schedule configuration JSON.
+export type TaskScheduleConfig = {
+  daysOfWeek?: number[]; // e.g. [1, 2, 3, 4, 5] (1=Monday ... 7=Sunday)
+  targetPerDay?: number; // e.g. 8 (for habits like 8 glasses of water)
+  targetPerWeek?: number; // e.g. 3 (times per week)
+};
 
 // Purpose: Define the columns and rules for a user account.
 // Meaning: notNull means a value is required; unique prevents two accounts from sharing an email.
@@ -60,12 +76,17 @@ export const users = pgTable("users", {
   city: text("city")
     .notNull(),
 
-    // Purpose: Track whether the user's email has been verified.
-    emailVerified: boolean("email_verified")
-      .default(false)
-      .notNull(),
+  // Purpose: Store user timezone for accurate streak and today-schedule calculations.
+  timezone: text("timezone")
+    .default("Asia/Manila")
+    .notNull(),
 
-    // Purpose: Record when the account was created.
+  // Purpose: Track whether the user's email has been verified.
+  emailVerified: boolean("email_verified")
+    .default(false)
+    .notNull(),
+
+  // Purpose: Record when the account was created.
   createdAt: timestamp("created_at", {
     withTimezone: true,
   })
@@ -83,7 +104,7 @@ export const users = pgTable("users", {
 });
 
 // Purpose: Define stored tokens associated with user accounts.
-// Meaning: The table supports refresh/email-verification token data, although those flows still need implementation.
+// Meaning: The table supports refresh/email-verification token data.
 export const tokens = pgTable("token", {
   // Purpose: Give each token record a unique identifier.
   id: uuid("id")
@@ -137,5 +158,149 @@ export const tokens = pgTable("token", {
   index("token_owner_type_idx").on(
     table.userId,
     table.type,
+  ),
+]);
+
+// Purpose: Define recurring tasks / habits owned by users.
+export const tasks = pgTable("tasks", {
+  id: uuid("id")
+    .primaryKey()
+    .defaultRandom(),
+
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    }),
+
+  title: text("title")
+    .notNull(),
+
+  description: text("description"),
+
+  frequency: taskFrequency("frequency")
+    .default("DAILY")
+    .notNull(),
+
+  scheduleConfig: jsonb("schedule_config").$type<TaskScheduleConfig>(),
+
+  preferredTimeWindow: text("preferred_time_window"), // e.g., 'MORNING', 'AFTERNOON', 'EVENING', 'ANYTIME'
+
+  color: text("color"),
+
+  icon: text("icon"),
+
+  position: integer("position")
+    .default(0)
+    .notNull(),
+
+  isArchived: boolean("is_archived")
+    .default(false)
+    .notNull(),
+
+  deletedAt: timestamp("deleted_at", {
+    withTimezone: true,
+  }),
+
+  // Email Reminder Settings
+  reminderEnabled: boolean("reminder_enabled")
+    .default(false)
+    .notNull(),
+
+  reminderTime: text("reminder_time"), // e.g. "08:30" (24-hour HH:mm)
+
+  reminderIntervalHours: integer("reminder_interval_hours")
+    .default(1)
+    .notNull(), // Repeat every N hours until completed
+
+  maxDailyReminders: integer("max_daily_reminders")
+    .default(4)
+    .notNull(), // Max reminders per day to prevent spam
+
+  lastRemindedAt: timestamp("last_reminded_at", {
+    withTimezone: true,
+  }),
+
+  reminderCountToday: integer("reminder_count_today")
+    .default(0)
+    .notNull(),
+
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+
+  updatedAt: timestamp("updated_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+}, (table) => [
+  index("tasks_user_active_idx").on(
+    table.userId,
+    table.deletedAt,
+    table.isArchived,
+  ),
+  index("tasks_user_position_idx").on(
+    table.userId,
+    table.position,
+  ),
+  index("tasks_reminder_active_idx").on(
+    table.reminderEnabled,
+    table.isArchived,
+    table.deletedAt,
+  ),
+]);
+
+// Purpose: Track daily completions and logs for tasks.
+export const taskCompletions = pgTable("task_completions", {
+  id: uuid("id")
+    .primaryKey()
+    .defaultRandom(),
+
+  taskId: uuid("task_id")
+    .notNull()
+    .references(() => tasks.id, {
+      onDelete: "cascade",
+    }),
+
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    }),
+
+  completedDate: text("completed_date")
+    .notNull(), // YYYY-MM-DD in user's timezone
+
+  completedAt: timestamp("completed_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+
+  count: integer("count")
+    .default(1)
+    .notNull(), // For habits completed multiple times a day
+
+  note: text("note"),
+
+  mood: integer("mood"), // Optional mood score 1-5
+
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+}, (table) => [
+  uniqueIndex("task_completions_task_date_uidx").on(
+    table.taskId,
+    table.completedDate,
+  ),
+  index("task_completions_user_date_idx").on(
+    table.userId,
+    table.completedDate,
   ),
 ]);
