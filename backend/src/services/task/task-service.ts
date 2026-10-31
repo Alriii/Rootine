@@ -32,7 +32,7 @@ export async function createTaskService(userId: string, input: CreateTaskInput) 
         reminderEnabled: input.reminderEnabled ?? false,
         reminderTime: input.reminderTime ?? null,
         reminderIntervalHours: input.reminderIntervalHours ?? 1,
-        maxDailyReminders: input.maxDailyReminders ?? 4,
+        maxDailyReminders: input.maxDailyReminders ?? 1,
     });
 
     return {
@@ -43,12 +43,15 @@ export async function createTaskService(userId: string, input: CreateTaskInput) 
     };
 }
 
-export async function listTasksService(userId: string, options: { includeArchived?: boolean } = {}) {
-    const tasks = await taskRepository.findManyByUserId(userId, options);
+export async function listTasksService(userId: string, options: { includeArchived?: boolean; page?: number; limit?: number } = {}) {
+    const result = await taskRepository.findManyByUserId(userId, options);
     return {
         code: 200,
         status: "success",
-        data: { tasks },
+        data: {
+            tasks: result.tasks,
+            pagination: result.pagination,
+        },
     };
 }
 
@@ -180,27 +183,25 @@ export async function getTodayDashboardService(userId: string) {
     const allActiveTasks = await taskRepository.findManyByUserId(userId, { includeArchived: false });
 
     // Filter tasks that are scheduled for today
-    const scheduledTasks = allActiveTasks.filter((task) =>
+    const scheduledTasks = allActiveTasks.tasks.filter((task) =>
         isTaskScheduledForDate(task.frequency, task.scheduleConfig, timezone, now)
     );
 
-    // Fetch all completions for the user to calculate streaks and today's status
-    const userCompletions = await taskCompletionRepository.findAllByUser(userId);
+    // Fix: Two-query strategy:
+    //   - Today's completions only  → used for completion status (fast)
+    //   - All completions per task  → used for streak calculation (accurate)
+    // Meaning: Like checking today's score vs. the full season record — both matter, but separately.
+    const todayCompletions = await taskCompletionRepository.findByUserAndDate(userId, todayStr);
+    const todayCompletionByTask = new Map(todayCompletions.map((c) => [c.taskId, c]));
 
-    // Group completion dates by taskId
-    const completionsByTask = new Map<string, Set<string>>();
-    const todayCompletionByTask = new Map<string, (typeof userCompletions)[0]>();
-
-    for (const comp of userCompletions) {
-        if (!completionsByTask.has(comp.taskId)) {
-            completionsByTask.set(comp.taskId, new Set());
-        }
-        completionsByTask.get(comp.taskId)!.add(comp.completedDate);
-
-        if (comp.completedDate === todayStr) {
-            todayCompletionByTask.set(comp.taskId, comp);
-        }
-    }
+    // Fetch full completion history only for tasks scheduled today (not all tasks ever)
+    const allCompletionsByTask = new Map<string, Set<string>>();
+    await Promise.all(
+        scheduledTasks.map(async (task) => {
+            const completions = await taskCompletionRepository.findByTask(task.id, userId);
+            allCompletionsByTask.set(task.id, new Set(completions.map((c) => c.completedDate)));
+        })
+    );
 
     let completedTasksToday = 0;
 
@@ -214,7 +215,7 @@ export async function getTodayDashboardService(userId: string) {
             completedTasksToday++;
         }
 
-        const taskCompletedDates = completionsByTask.get(task.id) || new Set();
+        const taskCompletedDates = allCompletionsByTask.get(task.id) ?? new Set<string>();
         const streakInfo = calculateTaskStreaks(
             task.frequency,
             task.scheduleConfig,
@@ -238,6 +239,8 @@ export async function getTodayDashboardService(userId: string) {
             currentStreak: streakInfo.currentStreak,
             reminderEnabled: task.reminderEnabled,
             reminderTime: task.reminderTime,
+            reminderIntervalHours: task.reminderIntervalHours,
+            maxDailyReminders: task.maxDailyReminders,
         };
     });
 

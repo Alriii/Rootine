@@ -21,18 +21,18 @@ export async function signUpService(input: RegisterInput) {
         name,
         email,
         passwordHash,
-        phoneNumber,
-        countryCode,
-        city,
+        phoneNumber: phoneNumber || "0000000000",
+        countryCode: countryCode || "PH",
+        city: city || "Cebu",
     });
 
-    // Automatically send verification email for newly created accounts
-    await sendVerificationEmailService({ email: newUser.email });
+    // Automatically send verification email for newly created accounts (with user's name)
+    await sendVerificationEmailService({ email: newUser.email, name: newUser.name });
 
     return {
         code: 201,
         status: "success",
-        message: "Account created successfully. A verification email has been sent.",
+        message: "Account created successfully. A verification code has been sent to your email.",
         data: { user: newUser },
     };
 }

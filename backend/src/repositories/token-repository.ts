@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, lt } from "drizzle-orm";
 import { db } from "@/db";
 import { tokens } from "@/db/schema";
 
@@ -60,6 +60,18 @@ export class TokenRepository {
                     isNull(tokens.revokedAt)
                 )
             );
+    }
+
+    // Purpose: Delete token records that have passed their expiry time.
+    // Meaning: Like a janitor clearing out expired visitor badges — keeps the DB tidy.
+    async deleteExpired() {
+        const now = new Date().toISOString();
+        const result = await db
+            .delete(tokens)
+            .where(lt(tokens.expiresAt, now))
+            .returning({ id: tokens.id });
+
+        return result.length;
     }
 }
 

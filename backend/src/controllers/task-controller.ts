@@ -1,4 +1,6 @@
+// Purpose: Handle HTTP requests for all task endpoints and return structured responses.
 import type { Request, Response } from "express";
+import { asyncHandler } from "@/middlewares/async-handler";
 import {
     createTaskService,
     listTasksService,
@@ -22,92 +24,92 @@ function getParamId(req: Request): string {
     return Array.isArray(id) ? id[0] : id;
 }
 
-export async function createTask(req: Request, res: Response) {
+export const createTask = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const result = await createTaskService(userId, req.body);
     return res.status(result.code).json(result);
-}
+});
 
-export async function listTasks(req: Request, res: Response) {
+export const listTasks = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const includeArchived = req.query.includeArchived === "true";
-    const result = await listTasksService(userId, { includeArchived });
+    const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 50;
+    const result = await listTasksService(userId, { includeArchived, page, limit });
     return res.status(result.code).json(result);
-}
+});
 
-export async function getTask(req: Request, res: Response) {
+export const getTask = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await getTaskService(id, userId);
     return res.status(result.code).json(result);
-}
+});
 
-export async function updateTask(req: Request, res: Response) {
+export const updateTask = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await updateTaskService(id, userId, req.body);
     return res.status(result.code).json(result);
-}
+});
 
-export async function deleteTask(req: Request, res: Response) {
+export const deleteTask = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await deleteTaskService(id, userId);
     return res.status(result.code).json(result);
-}
+});
 
-export async function archiveTask(req: Request, res: Response) {
+export const archiveTask = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await archiveTaskService(id, userId);
     return res.status(result.code).json(result);
-}
+});
 
-export async function unarchiveTask(req: Request, res: Response) {
+export const unarchiveTask = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await unarchiveTaskService(id, userId);
     return res.status(result.code).json(result);
-}
+});
 
-export async function reorderTasks(req: Request, res: Response) {
+export const reorderTasks = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const result = await reorderTasksService(userId, req.body);
     return res.status(result.code).json(result);
-}
+});
 
-export async function completeTask(req: Request, res: Response) {
+export const completeTask = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await completeTaskService(id, userId, req.body || {});
     return res.status(result.code).json(result);
-}
+});
 
-export async function uncompleteTask(req: Request, res: Response) {
+export const uncompleteTask = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await uncompleteTaskService(id, userId, req.body || {});
     return res.status(result.code).json(result);
-}
+});
 
-export async function listTaskCompletions(req: Request, res: Response) {
+export const listTaskCompletions = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await listTaskCompletionsService(id, userId);
     return res.status(result.code).json(result);
-}
+});
 
-// Phase 1.3: Today's Dashboard Endpoint
-export async function getTodayDashboard(req: Request, res: Response) {
+export const getTodayDashboard = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const result = await getTodayDashboardService(userId);
     return res.status(result.code).json(result);
-}
+});
 
-// Phase 1.4: Detailed Task Stats Endpoint
-export async function getTaskStats(req: Request, res: Response) {
+export const getTaskStats = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const id = getParamId(req);
     const result = await getTaskStatsService(id, userId);
     return res.status(result.code).json(result);
-}
+});

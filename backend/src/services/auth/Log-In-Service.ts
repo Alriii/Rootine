@@ -6,6 +6,8 @@ import { userRepository } from "@/repositories/user-repository";
 import { tokenRepository } from "@/repositories/token-repository";
 import { ENV } from "@/config/env";
 
+const ACCESS_TOKEN_EXPIRY_SECONDS = 600; // 10 minutes
+
 export async function loginService(input: LoginInput) {
     const { email, password } = input;
 
@@ -19,7 +21,17 @@ export async function loginService(input: LoginInput) {
         return { code: 401, status: "error", message: "Invalid email or password" };
     }
 
-    const token = jwt.sign({ userId: user.id }, ENV.JWT_SECRET, { expiresIn: "10m" }); // Access token: 10m
+    // Fix #2: Block unverified accounts from logging in.
+    // Meaning: Like a club — you signed up but must confirm your invite before entering.
+    if (!user.emailVerified) {
+        return {
+            code: 403,
+            status: "error",
+            message: "Please verify your email address before logging in. Check your inbox for the verification token.",
+        };
+    }
+
+    const token = jwt.sign({ userId: user.id }, ENV.JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY_SECONDS });
     const refreshToken = crypto.randomBytes(32).toString("hex");
     const refreshTokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
     const refreshExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days
@@ -44,6 +56,9 @@ export async function loginService(input: LoginInput) {
                 emailVerified: user.emailVerified,
             },
             token,
+            // Fix #3 hint: Tell the client exactly when the access token expires
+            // so it can silently refresh before the user notices.
+            expiresIn: ACCESS_TOKEN_EXPIRY_SECONDS,
             refreshToken,
         },
     };

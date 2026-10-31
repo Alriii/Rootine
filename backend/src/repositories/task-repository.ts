@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, sql, count } from "drizzle-orm";
 import { db } from "@/db";
 import { tasks } from "@/db/schema";
 
@@ -42,8 +42,12 @@ export class TaskRepository {
         return task || null;
     }
 
-    // Purpose: List non-deleted tasks for a user, sorted by position.
-    async findManyByUserId(userId: string, options: { includeArchived?: boolean } = {}) {
+    // Purpose: List non-deleted tasks for a user, sorted by position, with optional pagination.
+    // Meaning: Like a library shelf — you can ask for "all books" or just "page 1, 20 books".
+    async findManyByUserId(
+        userId: string,
+        options: { includeArchived?: boolean; page?: number; limit?: number } = {}
+    ) {
         const conditions = [
             eq(tasks.userId, userId),
             isNull(tasks.deletedAt),
@@ -53,11 +57,34 @@ export class TaskRepository {
             conditions.push(eq(tasks.isArchived, false));
         }
 
-        return db
-            .select()
-            .from(tasks)
-            .where(and(...conditions))
-            .orderBy(asc(tasks.position), asc(tasks.createdAt));
+        const page = Math.max(1, options.page ?? 1);
+        const limit = Math.min(100, Math.max(1, options.limit ?? 50));
+        const offset = (page - 1) * limit;
+
+        const [rows, [{ total }]] = await Promise.all([
+            db
+                .select()
+                .from(tasks)
+                .where(and(...conditions))
+                .orderBy(asc(tasks.position), asc(tasks.createdAt))
+                .limit(limit)
+                .offset(offset),
+            db
+                .select({ total: count() })
+                .from(tasks)
+                .where(and(...conditions)),
+        ]);
+
+        return {
+            tasks: rows,
+            pagination: {
+                page,
+                limit,
+                total: Number(total),
+                totalPages: Math.ceil(Number(total) / limit),
+                hasNextPage: page * limit < Number(total),
+            },
+        };
     }
 
     // Purpose: Update fields of a specific task owned by user.

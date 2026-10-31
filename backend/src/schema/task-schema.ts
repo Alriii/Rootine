@@ -41,7 +41,7 @@ export const createTaskSchema = z.object({
             .nullable()
             .optional(),
         reminderIntervalHours: z.number().int().min(1).max(12).default(1).optional(),
-        maxDailyReminders: z.number().int().min(1).max(10).default(4).optional(),
+        maxDailyReminders: z.number().int().min(1).max(10).default(1).optional(),
     }),
 });
 

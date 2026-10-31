@@ -14,17 +14,17 @@ export const registerSchema = z.object({
     body: z.object({
         name: z
             .string({ message: "Name is required" })
-            .min(3, { message: "Name must be at least 3 characters" }),
+            .min(1, { message: "Name is required" }),
         email: z.string({ message: "Invalid Email format" }).email({
             message: "Email is required and must be a valid email address",
         }),
         password: passwordField,
-        phoneNumber: z.string({ message: "Phone number is required" }),
-        countryCode: z.string({ message: "Country code is required" }),
+        phoneNumber: z.string().default("0000000000").optional(),
+        countryCode: z.string().default("PH").optional(),
         city: z
-            .string({ message: "City is required" })
-            .regex(/^[A-Za-z\s]+$/, { message: "City must only contain letters and spaces" })
-            .regex(/^[A-Z][a-zA-Z\s]*$/, { message: "City must start with a capital letter" }),
+            .string()
+            .default("Cordova")
+            .optional(),
     }),
 });
 
@@ -45,8 +45,11 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
     body: z.object({
-        token: z.string({ message: "Token is required" }),
+        token: z.string().optional(),
+        code: z.string().optional(),
         newPassword: passwordField,
+    }).refine((data) => Boolean(data.token || data.code), {
+        message: "Reset token or code is required",
     }),
 });
 
@@ -64,7 +67,10 @@ export const logoutSchema = z.object({
 
 export const verifyEmailSchema = z.object({
     body: z.object({
-        token: z.string({ message: "Verification token is required" }),
+        token: z.string().optional(),
+        code: z.string().optional(),
+    }).refine((data) => Boolean(data.token || data.code), {
+        message: "Verification code is required",
     }),
 });
 

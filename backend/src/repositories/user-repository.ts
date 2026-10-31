@@ -33,6 +33,8 @@ export class UserRepository {
                 phoneNumber: users.phoneNumber,
                 countryCode: users.countryCode,
                 city: users.city,
+                country: users.country,
+                zipCode: users.zipCode,
                 timezone: users.timezone,
                 emailVerified: users.emailVerified,
                 createdAt: users.createdAt,

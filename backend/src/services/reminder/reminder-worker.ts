@@ -2,6 +2,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { tasks, users } from "@/db/schema";
 import { taskCompletionRepository } from "@/repositories/task-completion-repository";
+import { tokenRepository } from "@/repositories/token-repository";
 import { sendEmail } from "@/utils/mailer";
 import {
     getLocalDateString,
@@ -11,9 +12,21 @@ import {
 } from "@/utils/timezone";
 
 let reminderIntervalHandle: NodeJS.Timeout | null = null;
+let lastTokenCleanupDate: string | null = null;
 
 export async function processTaskReminders() {
     try {
+        // Fix: Run expired-token cleanup once per day (piggybacks on the reminder worker).
+        // Meaning: Like a janitor who sweeps the floor once a day while already on duty.
+        const todayUtc = new Date().toISOString().slice(0, 10);
+        if (lastTokenCleanupDate !== todayUtc) {
+            const deleted = await tokenRepository.deleteExpired();
+            if (deleted > 0) {
+                console.log(`[TOKEN CLEANUP] Deleted ${deleted} expired token(s).`);
+            }
+            lastTokenCleanupDate = todayUtc;
+        }
+
         // Query all active tasks with reminders enabled
         const activeTasks = await db
             .select({
@@ -79,8 +92,9 @@ export async function processTaskReminders() {
                 continue;
             }
 
-            // 5. Anti-spam: Max daily reminders limit
-            if (reminderCountToday >= task.maxDailyReminders) {
+            // 5. Anti-spam: honor user's chosen max daily reminders (default 1)
+            const maxDaily = task.maxDailyReminders ?? 1;
+            if (reminderCountToday >= maxDaily) {
                 continue;
             }
 
@@ -101,7 +115,8 @@ export async function processTaskReminders() {
             }
 
             // 7. Dispatch Reminder Email
-            const emailSubject = `⏰ Reminder: ${task.title} - Rootine`;
+            // Fix #5: Plain text subject — avoids encoding issues across all email clients.
+            const emailSubject = `[Reminder] ${task.title} - Rootine`;
             const emailHtml = `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
                     <h2 style="color: #10b981; margin-top: 0;">Rootine Task Reminder</h2>
@@ -136,7 +151,7 @@ export async function processTaskReminders() {
                 .where(eq(tasks.id, task.id));
 
             console.log(
-                `[REMINDER] Sent email to ${user.email} for task "${task.title}" (nudge #${reminderCountToday + 1})`
+                `[REMINDER] Sent email to ${user.email} for task "${task.title}" (daily reminder)`
             );
         }
     } catch (error) {

@@ -76,6 +76,12 @@ export const users = pgTable("users", {
   city: text("city")
     .notNull(),
 
+  // Purpose: Store user country and zip code.
+  country: text("country")
+    .default("Philippines"),
+
+  zipCode: text("zip_code"),
+
   // Purpose: Store user timezone for accurate streak and today-schedule calculations.
   timezone: text("timezone")
     .default("Asia/Manila")
@@ -214,8 +220,8 @@ export const tasks = pgTable("tasks", {
     .notNull(), // Repeat every N hours until completed
 
   maxDailyReminders: integer("max_daily_reminders")
-    .default(4)
-    .notNull(), // Max reminders per day to prevent spam
+    .default(1)
+    .notNull(), // Max reminders per day (single daily reminder)
 
   lastRemindedAt: timestamp("last_reminded_at", {
     withTimezone: true,
